@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll} from 'react-native';
 import axios from 'axios';
-
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 export default function App() {
   const [items, setItems] = useState([]);
   axios.defaults.baseURL = 'https://online-store-service.onrender.com';
@@ -17,9 +18,75 @@ export default function App() {
 
   }, []);
 
+  const downloadLivePhoto = async () => {
+    const imageUrl = 'https://firebasestorage.googleapis.com/v0/b/palettex-37930.appspot.com/o/digital_file%2FE5712677-FC33-494F-93BB-A525A183C659.HEIC?alt=media&token=2f53a02b-1520-4d40-a9ac-99b5c20b9e0b'; // URL or path to the still image
+    const videoUrl = 'https://firebasestorage.googleapis.com/v0/b/palettex-37930.appspot.com/o/digital_file%2FE5712677-FC33-494F-93BB-A525A183C659.MOV?alt=media&token=c9a6bd75-59ac-48e5-900f-4e03dab70270'; // URL or path to the video file
+
+    const imageUri = await saveToCameraRoll(imageUrl);
+    const videoUri = await saveVideo(videoUrl);
+  };
+
+  const saveToCameraRoll = async (image) => {
+    let cameraPermissions = await MediaLibrary.getPermissionsAsync();
+    if (cameraPermissions.status !== 'granted') {
+      cameraPermissions = await MediaLibrary.requestPermissionsAsync();
+    }
+
+    if (cameraPermissions.status === 'granted') {
+      FileSystem.downloadAsync(
+        image,
+        FileSystem.documentDirectory + 'E5712677-FC33-494F-93BB-A525A183C659.HEIC'
+      )
+        .then(({ uri }) => {
+          console.log('img uri='+uri)
+          MediaLibrary.saveToLibraryAsync(uri);
+          alert('Photo Saved to photos');
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      alert('Requires camera roll permission');
+    }
+  };
+
+  const saveVideo = async (video) => {
+    let cameraPermissions = await MediaLibrary.getPermissionsAsync();
+    if (cameraPermissions.status !== 'granted') {
+      cameraPermissions = await MediaLibrary.requestPermissionsAsync();
+    }
+
+    if (cameraPermissions.status === 'granted') {
+      FileSystem.downloadAsync(
+        video,
+        FileSystem.documentDirectory + 'E5712677-FC33-494F-93BB-A525A183C659.MOV'
+      )
+        .then(({ uri }) => {
+          console.log('video uri='+uri)
+          MediaLibrary.saveToLibraryAsync(uri);
+          alert('Video Saved to photos');
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      alert('Requires camera roll permission');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
+      <View>
+        <Button
+          title="Download Live Photo"
+          onPress={downloadLivePhoto}
+          color={Platform.OS === 'android' ? 'blue' : undefined} // Adjust button color for Android
+        />
+        <TouchableOpacity activeOpacity={0.5}>
+          <Text>CLICK TEST</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {items.map((item, index) => (
           <View key={index} style={styles.itemContainer}>
