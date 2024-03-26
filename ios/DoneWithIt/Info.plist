@@ -6,6 +6,8 @@
     <true/>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Live photo test</string>
     <key>CFBundleDisplayName</key>
     <string>DoneWithIt</string>
     <key>CFBundleExecutable</key>

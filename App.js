@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll} from 'react-native';
+import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll,NativeModules} from 'react-native';
 import axios from 'axios';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
+
 export default function App() {
   const [items, setItems] = useState([]);
   axios.defaults.baseURL = 'https://online-store-service.onrender.com';
@@ -12,6 +13,8 @@ export default function App() {
     const { data } = await axios.get('/api/items');
     return data;
   };
+
+  const {CustomMethods} = NativeModules;
 
   useEffect(() => {
     getAllItems().then(items => setItems(items));
@@ -25,6 +28,11 @@ export default function App() {
     const imageUri = await saveToCameraRoll(imageUrl);
     const videoUri = await saveVideo(videoUrl);
   };
+
+  const testNativeModule = () => {
+    console.log('call testNativeModule()');
+    CustomMethods.MyMethod('this is test');
+  }
 
   const saveToCameraRoll = async (image) => {
     let cameraPermissions = await MediaLibrary.getPermissionsAsync();
@@ -84,7 +92,7 @@ export default function App() {
           color={Platform.OS === 'android' ? 'blue' : undefined} // Adjust button color for Android
         />
         <TouchableOpacity activeOpacity={0.5}>
-          <Text>CLICK TEST</Text>
+          <Text onPress={testNativeModule}>CLICK TEST</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
