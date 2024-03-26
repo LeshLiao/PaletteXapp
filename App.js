@@ -7,6 +7,12 @@ import * as FileSystem from 'expo-file-system';
 
 export default function App() {
   const [items, setItems] = useState([]);
+  const [myImage, setMyImage] = useState('');
+  const [myVideo, setMyVideo] = useState('');
+
+  let varMyImage = '';
+  let varMyVideo = '';
+
   axios.defaults.baseURL = 'https://online-store-service.onrender.com';
 
   const getAllItems = async () => {
@@ -25,16 +31,20 @@ export default function App() {
     const imageUrl = 'https://firebasestorage.googleapis.com/v0/b/palettex-37930.appspot.com/o/digital_file%2FE5712677-FC33-494F-93BB-A525A183C659.HEIC?alt=media&token=2f53a02b-1520-4d40-a9ac-99b5c20b9e0b'; // URL or path to the still image
     const videoUrl = 'https://firebasestorage.googleapis.com/v0/b/palettex-37930.appspot.com/o/digital_file%2FE5712677-FC33-494F-93BB-A525A183C659.MOV?alt=media&token=c9a6bd75-59ac-48e5-900f-4e03dab70270'; // URL or path to the video file
 
-    const imageUri = await saveToCameraRoll(imageUrl);
-    const videoUri = await saveVideo(videoUrl);
+    const imageUri = await saveToCameraRoll(imageUrl,videoUrl);
+    // const videoUri = await saveVideo(videoUrl);
   };
 
   const testNativeModule = () => {
     console.log('call testNativeModule()');
     CustomMethods.MyMethod('this is test');
+    console.log('varMyImage='+varMyImage);
+    console.log('varMyVideo='+varMyVideo);
+    CustomMethods.combineImage(varMyImage, varMyVideo);
+    alert('Live photo saved!');
   }
 
-  const saveToCameraRoll = async (image) => {
+  const saveToCameraRoll = async (image, video) => {
     let cameraPermissions = await MediaLibrary.getPermissionsAsync();
     if (cameraPermissions.status !== 'granted') {
       cameraPermissions = await MediaLibrary.requestPermissionsAsync();
@@ -46,9 +56,11 @@ export default function App() {
         FileSystem.documentDirectory + 'E5712677-FC33-494F-93BB-A525A183C659.HEIC'
       )
         .then(({ uri }) => {
-          console.log('img uri='+uri)
-          MediaLibrary.saveToLibraryAsync(uri);
-          alert('Photo Saved to photos');
+          console.log('img uri='+uri);
+          varMyImage = uri;
+          // MediaLibrary.saveToLibraryAsync(uri);
+          // alert('Photo Saved to photos');
+          saveVideo(video);
         })
         .catch(error => {
           console.log(error);
@@ -70,9 +82,11 @@ export default function App() {
         FileSystem.documentDirectory + 'E5712677-FC33-494F-93BB-A525A183C659.MOV'
       )
         .then(({ uri }) => {
-          console.log('video uri='+uri)
-          MediaLibrary.saveToLibraryAsync(uri);
-          alert('Video Saved to photos');
+          console.log('video uri='+uri);
+          varMyVideo = uri;
+          // MediaLibrary.saveToLibraryAsync(uri);
+          testNativeModule();
+          // alert('Video Saved to photos');
         })
         .catch(error => {
           console.log(error);
@@ -92,7 +106,7 @@ export default function App() {
           color={Platform.OS === 'android' ? 'blue' : undefined} // Adjust button color for Android
         />
         <TouchableOpacity activeOpacity={0.5}>
-          <Text onPress={testNativeModule}>CLICK TEST</Text>
+          <Text onPress={testNativeModule}>CLICK TEST 02</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
