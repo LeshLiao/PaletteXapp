@@ -1,10 +1,11 @@
-import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll,NativeModules} from 'react-native';
+import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll,NativeModules, ImageBackground} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 export default function Home() {
   const [items, setItems] = useState([]);
@@ -95,63 +96,67 @@ export default function Home() {
     }
   };
 
-  const handleImagePress = (imageUri) => {
-    navigation.navigate('Detail', { imageUri });
+  const handleImagePress = (imageUri, link) => {
+    navigation.navigate('Preview', { imageUri, link });
   };
 
   return (
     // <SafeAreaView style={styles.container}>
+    <>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <BannerAd
+          unitId={"ca-app-pub-2358475138249813/5341581079"}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        />
       <Text style={styles.title}>Wallpaper</Text>
-      {/* <StatusBar style="auto" /> */}
       <View>
         <Button
           title="Download Live Photo"
           onPress={downloadLivePhoto}
-          color={Platform.OS === 'android' ? 'blue' : undefined} // Adjust button color for Android
+          color="#333"
         />
       </View>
 
         {items.map((item, index) => (
-          // <View key={index} style={styles.itemContainer}>
-          //   <Image source={{     uri: item.thumbnail.includes('https') ? item.thumbnail : `https://www.palettex.ca/images/items/${item.itemId}/${item.thumbnail}` }} style={styles.thumbnail} />
-          // </View>
           <TouchableOpacity key={index} style={styles.itemContainer} onPress={() => handleImagePress(
-            item.thumbnail.includes('https') ? item.thumbnail : `https://www.palettex.ca/images/items/${item.itemId}/${item.thumbnail}`
+            item.thumbnail.includes('https') ? item.thumbnail : `https://www.palettex.ca/images/items/${item.itemId}/${item.thumbnail}`,item.downloadList[0].link
           )}>
           <Image source={{ uri: item.thumbnail.includes('https') ? item.thumbnail : `https://www.palettex.ca/images/items/${item.itemId}/${item.thumbnail}` }} style={styles.thumbnail} />
         </TouchableOpacity>
         ))}
       </ScrollView>
+    </>
     // </SafeAreaView>
-
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     // flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     // marginTop: Platform.OS === 'android' ? StatusBar.height : 100,
   },
   scrollViewContent: {
+    backgroundColor: '#fff',
     flexGrow: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingVertical: 10,
   },
   itemContainer: {
-    width: '50%', // Adjust the width as per your layout
-    marginVertical: 2,
-    paddingHorizontal: 2,
+    width: '49%', // Adjust the width as per your layout
+    marginVertical: 5,
+    paddingHorizontal: 3,
   },
   thumbnail: {
     width: '100%',
-    aspectRatio: 9 / 16, // Adjusted to 9:16 ratio
+    aspectRatio: 9 / 19, // Adjusted to 9:16 ratio
     borderRadius: 10, // Rounded corners for images
   },
   title: {
     fontSize: 25,
+    color: '#333',
   },
 });

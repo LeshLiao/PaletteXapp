@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, Dimensions,ImageBackground, Text,StatusBar } from 'react-native';
 import Menu from './Menu';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Detail({ route }) {
-  const { imageUri } = route.params;
+  const { imageUri, link } = route.params;
 
   return (
     <View style={styles.container}>
       <Image source={{ uri: imageUri }} style={styles.image} resizeMode="cover" />
       <View style={styles.menuContainer}>
-        <Menu/>
+        <Menu link={link}/>
       </View>
     </View>
   );
@@ -38,6 +38,5 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end', // Adjust as needed
     alignItems: 'center', // Adjust as needed
     marginBottom: 35, // Adjust as needed to leave space from the bottom
-
   }
 });
