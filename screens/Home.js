@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll,NativeModules, ImageBackground} from 'react-native';
+import { StyleSheet, View, Image, SafeAreaView, Platform, ScrollView,Text , Button, Linking, TouchableOpacity, CameraRoll,NativeModules, ImageBackground,Modal} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -6,10 +6,15 @@ import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import Menu from './Menu';
 
 export default function Home() {
   const [items, setItems] = useState([]);
   const navigation = useNavigation(); // Get the navigation object
+  const [showModal, setShowModal] = useState(false);
+  const [modalImg, setModalImg] = useState('');
+  const [downloadLink, setDownloadLink] = useState('');
+
   let varMyImage = '';
   let varMyVideo = '';
 
@@ -97,7 +102,10 @@ export default function Home() {
   };
 
   const handleImagePress = (imageUri, link) => {
-    navigation.navigate('Preview', { imageUri, link });
+    // navigation.navigate('Preview', { imageUri, link });
+    setModalImg(imageUri);
+    setShowModal(true);
+    setDownloadLink(link);
   };
 
   return (
@@ -124,6 +132,28 @@ export default function Home() {
           <Image source={{ uri: item.thumbnail.includes('https') ? item.thumbnail : `https://www.palettex.ca/images/items/${item.itemId}/${item.thumbnail}` }} style={styles.thumbnail} />
         </TouchableOpacity>
         ))}
+
+        <Modal
+          animationType={'fade'}
+          // animationType={'none'}
+          transparent={false}
+          visible={showModal}
+          onRequestClose={() => {
+              console.log('close....')
+        }}>
+
+        <ImageBackground source={{ uri: modalImg }} style={styles.imageBackground}>
+          <View style={styles.menuContainer}>
+            <Menu link={downloadLink}/>
+          </View>
+          <Button
+            title='Click to close========'
+            onPress={() => {
+              setShowModal(false);
+            }}
+          />
+        </ImageBackground>
+      </Modal>
       </ScrollView>
     </>
     // </SafeAreaView>
@@ -142,21 +172,43 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     // justifyContent: 'space-between',
-    justifyContent: 'space-around',
+    justifyContent: "center",
     paddingVertical: 10,
   },
   itemContainer: {
     width: '49%', // Adjust the width as per your layout
-    marginVertical: 5,
-    paddingHorizontal: 3,
+    marginVertical: '0.66%',
+    paddingHorizontal: '0.66%',
   },
   thumbnail: {
     width: '100%',
-    aspectRatio: 9 / 19, // Adjusted to 9:16 ratio
+    aspectRatio: 9 / 18, // Adjusted to 9:16 ratio
     borderRadius: 10, // Rounded corners for images
   },
   title: {
     fontSize: 25,
     color: '#333',
+  },
+  modal: {
+    flex: 1,
+    alignContent:'center',
+    backgroundColor: '#00ff00',
+    padding: 100
+  },
+  imageBackground: {
+    backgroundColor:'#000',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end', // Adjust as needed
+    alignItems: 'center', // Adjust as needed
+    marginBottom: 35, // Adjust as needed to leave space from the bottom
   },
 });
